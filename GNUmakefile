@@ -10,6 +10,7 @@ GOBIN ?= $(GOPATH)/bin
 GO_LDFLAGS := $(shell tools/bin/ldflags)
 GOFLAGS = -ldflags "$(GO_LDFLAGS)"
 DOCKERFILE := core/chainlink.Dockerfile
+NONROOT_DOCKERFILE := core/chainlink-nonroot.Dockerfile
 DOCKER_TAG ?= latest
 
 TAGGED_REPO := $(REPO):$(DOCKER_TAG)
@@ -91,6 +92,16 @@ docker: ## Build the docker image.
 		docker build \
 		-f $(DOCKERFILE) \
 		--build-arg BUILDER=$(BUILDER) \
+		--build-arg ENVIRONMENT=$(ENVIRONMENT) \
+		--build-arg COMMIT_SHA=$(COMMIT_SHA) \
+		-t $(TAGGED_REPO) \
+		.
+
+.PHONY: docker
+docker-nonroot: ## Build the non-root docker image.
+		docker build \
+		-f $(NONROOT_DOCKERFILE) \
+		--build-arg "BUILDER=$(AWS_ECR_URL)/builder" \
 		--build-arg ENVIRONMENT=$(ENVIRONMENT) \
 		--build-arg COMMIT_SHA=$(COMMIT_SHA) \
 		-t $(TAGGED_REPO) \
