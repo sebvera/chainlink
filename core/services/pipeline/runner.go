@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/smartcontractkit/chainlink/core/logger"
 	"github.com/smartcontractkit/chainlink/core/services/postgres"
 	"github.com/smartcontractkit/chainlink/core/utils"
@@ -34,6 +36,15 @@ type (
 		chStop chan struct{}
 		chDone chan struct{}
 	}
+)
+
+var (
+	promPipelineTaskExecutionTime = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "pipeline_task_execution_time",
+		Help: "How long each pipeline task took to execute",
+	},
+		[]string{"pipeline_spec_id", "task_type"},
+	)
 )
 
 func NewRunner(orm ORM, config Config) *runner {
@@ -180,6 +191,8 @@ func (r *runner) processTaskRun() (anyRemaining bool, err error) {
 			"taskRunID", taskRun.ID,
 		}
 
+		start := time.Now()
+
 		logger.Infow("Running pipeline task", loggerFields...)
 
 		inputs := make([]Result, len(predecessors))
@@ -211,6 +224,9 @@ func (r *runner) processTaskRun() (anyRemaining bool, err error) {
 			}
 			logger.Infow("Pipeline task completed", f...)
 		}
+
+		elapsed := time.Since(start)
+		promPipelineTaskExecutionTime.WithLabelValues(string(taskRun.PipelineTaskSpec.PipelineSpecID), string(taskRun.PipelineTaskSpec.Type)).Set(float64(elapsed))
 
 		return result
 	})
