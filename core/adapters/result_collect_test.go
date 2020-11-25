@@ -43,6 +43,12 @@ func TestResultCollect_Perform(t *testing.T) {
 			expectedResultCollection: gjson.ParseBytes([]byte(`[false,20.214]`)).Array(),
 			expectedResult:           gjson.ParseBytes([]byte(`20.214`)),
 		},
+		{
+			name:                     "exists non-array",
+			json:                     fmt.Sprintf(`{"result":20.214,"%s":false}`, models.ResultCollectionKey),
+			expectedResultCollection: gjson.ParseBytes([]byte(`[false,20.214]`)).Array(),
+			expectedResult:           gjson.ParseBytes([]byte(`20.214`)),
+		},
 	}
 
 	for _, tc := range tt {
