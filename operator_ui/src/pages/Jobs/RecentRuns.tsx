@@ -11,8 +11,8 @@ import {
 import Button from 'components/Button'
 import BaseLink from 'components/BaseLink'
 import Content from 'components/Content'
-import JobRunsList from 'components/JobRuns/List'
-import TaskListDag from 'components/Jobs/TaskListDag'
+import JobRunsList from './JobRunsList'
+import TaskListDag from './TaskListDag'
 import TaskList from 'components/Jobs/TaskList'
 import React from 'react'
 import { GWEI_PER_TOKEN } from 'utils/constants'
@@ -118,10 +118,10 @@ export const RecentRuns = withStyles(chartCardStyles)(
               </Card>
             </Grid>
             <Grid item xs={4}>
-              {job?.type === 'Off-chain reporting' && (
+              {job?.type === 'Off-chain reporting' && job.dotDagSource !== '' && (
                 <Grid item xs>
                   <Card className={classes.card}>
-                    <CardTitle divider>Task List</CardTitle>
+                    <CardTitle divider>Task list</CardTitle>
                     <TaskListDag dotSource={job.dotDagSource} />
                   </Card>
                 </Grid>
@@ -145,7 +145,7 @@ export const RecentRuns = withStyles(chartCardStyles)(
                   </Grid>
                   <Grid item xs>
                     <Card>
-                      <CardTitle divider>Task List</CardTitle>
+                      <CardTitle divider>Task list</CardTitle>
                       <TaskList tasks={job.tasks} />
                     </Card>
                   </Grid>

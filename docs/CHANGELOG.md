@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - OCR bootstrap node now sends telemetry to the endpoint specified in the OCR job spec under `MonitoringEndpoint`
 
+## [0.9.6] - 2020-11-23
+
+- OCR pipeline specs can now be configured on a per-task basis to allow unrestricted network access for http tasks. Example like so:
+
+```
+ds1          [type=http method=GET url="http://example.com" allowunrestrictednetworkaccess="true"];
+ds1_parse    [type=jsonparse path="USD" lax="true"];
+ds1_multiply [type=multiply times=100];
+ds1 -> ds1_parse -> ds1_multiply;
+```
+
 ### Changed
 
 Numerous key-related UX improvements:
@@ -25,6 +36,9 @@ Numerous key-related UX improvements:
 - Output from ETH/OCR/P2P/VRF key CLI commands now renders consistently.
 - Deleting an OCR/P2P/VRF key now requires confirmation from the user. To skip confirmation (e.g. in shell scripts), pass `--yes` or `-y`.
 - The `--ocrpassword` flag has been removed. OCR/P2P keys now share the same password at the ETH key (i.e., the password specified with the `--password` flag).
+
+Misc:
+
 - Two new env variables are added `P2P_ANNOUNCE_IP` and `P2P_ANNOUNCE_PORT` which allow node operators to override locally detected values for the chainlink node's externally reachable IP/port.
 - `OCR_LISTEN_IP` and `OCR_LISTEN_PORT` have been renamed to `P2P_LISTEN_IP` and `P2P_LISTEN_PORT` for consistency.
 - Support for adding a job with the same name as one that was deleted.
@@ -32,6 +46,7 @@ Numerous key-related UX improvements:
 ### Fixed
 
 - Fixed an issue where the HTTP adapter would send an empty body on retries.
+- Changed the default `JOB_PIPELINE_REAPER_THRESHOLD` value from `7d` to `168h` (hours are the highest time unit allowed by `time.Duration`).
 
 ## [0.9.5] - 2020-11-12
 
