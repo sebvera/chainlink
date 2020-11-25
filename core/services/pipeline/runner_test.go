@@ -121,6 +121,8 @@ func TestRunner(t *testing.T) {
 		}
 	})
 
+	config.Set("DEFAULT_HTTP_ALLOW_UNRESTRICTED_NETWORK_ACCESS", false)
+
 	t.Run("handles the case where the parsed value is literally null", func(t *testing.T) {
 		var httpURL string
 		resp := `{"USD": null}`
@@ -164,6 +166,7 @@ func TestRunner(t *testing.T) {
 		for _, run := range runs {
 			if run.DotID() == "ds1" {
 				assert.True(t, run.Error.IsZero())
+				require.NotNil(t, resp, run.Output)
 				assert.Equal(t, resp, run.Output.Val)
 			} else if run.DotID() == "ds1_parse" {
 				assert.True(t, run.Error.IsZero())
@@ -341,6 +344,8 @@ ds1 -> ds1_parse;
 
 		err = jobORM.CreateJob(context.Background(), &models.JobSpecV2{
 			OffchainreportingOracleSpec: &os.OffchainReportingOracleSpec,
+			Type:                        string(offchainreporting.JobType),
+			SchemaVersion:               os.SchemaVersion,
 		}, os.TaskDAG())
 		require.NoError(t, err)
 		var jb models.JobSpecV2
@@ -391,6 +396,8 @@ ds1 -> ds1_parse;
 		require.NoError(t, err)
 		err = jobORM.CreateJob(context.Background(), &models.JobSpecV2{
 			OffchainreportingOracleSpec: &os.OffchainReportingOracleSpec,
+			Type:                        string(offchainreporting.JobType),
+			SchemaVersion:               os.SchemaVersion,
 		}, os.TaskDAG())
 		require.NoError(t, err)
 		var jb models.JobSpecV2

@@ -80,7 +80,7 @@ answer2 [type=bridge name=election_winner index=1];
 
 	simpleFetchDataSourceTemplate = `
 // data source 1
-ds1          [type=http method=GET url="%s"];
+ds1          [type=http method=GET url="%s" allowunrestrictednetworkaccess="true"];
 ds1_parse    [type=jsonparse path="USD" lax=%t];
 ds1_multiply [type=multiply times=100];
 ds1 -> ds1_parse -> ds1_multiply;
@@ -117,7 +117,11 @@ func makeOCRJobSpecWithHTTPURL(t *testing.T, db *gorm.DB, jobSpecToml string) (*
 	err := toml.Unmarshal([]byte(jobSpecToml), &ocrspec)
 	require.NoError(t, err)
 
-	dbSpec := models.JobSpecV2{OffchainreportingOracleSpec: &ocrspec.OffchainReportingOracleSpec}
+	dbSpec := models.JobSpecV2{
+		OffchainreportingOracleSpec: &ocrspec.OffchainReportingOracleSpec,
+		Type:                        string(offchainreporting.JobType),
+		SchemaVersion:               ocrspec.SchemaVersion,
+	}
 	return &ocrspec, &dbSpec
 }
 
